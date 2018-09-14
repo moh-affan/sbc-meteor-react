@@ -78,7 +78,7 @@ class DisplayData extends Component {
             idProduk: ""
         });
         try {
-            event.target.id.value = "";
+            event.target.pid.value = "";
             event.target.nama.value = "";
             event.target.hargaJual.value = "";
             event.target.hargaBeli.value = "";
@@ -95,12 +95,18 @@ class DisplayData extends Component {
                 dangerMode: true,
                 timer: 1000
             });
+        if (this.state.supplier == null)
+            swal({
+                text: "Supplier harus diisi",
+                dangerMode: true,
+                timer: 1000
+            });
         let target = event.target;
-        if (target._id.value != "") {
+        if (this.state.idProduk !== "") {
             Meteor.call(
                 "produk.update",
                 this.state.idProduk,
-                target.id.value,
+                target.pid.value,
                 target.nama.value,
                 this.state.kategori.label,
                 this.state.supplier ? this.state.supplier.obj : null,
@@ -111,7 +117,7 @@ class DisplayData extends Component {
         } else {
             Meteor.call(
                 "produk.insert",
-                target.id.value,
+                target.pid.value,
                 target.nama.value,
                 this.state.kategori.label,
                 this.state.supplier ? this.state.supplier.obj : null,
@@ -125,9 +131,9 @@ class DisplayData extends Component {
     }
 
     handleKategoriChange = (newValue, actionMeta) => {
-        if (actionMeta.action == "select-option") {
+        if (actionMeta.action === "select-option") {
             console.log(actionMeta);
-        } else if (actionMeta.action == "create-option") {
+        } else if (actionMeta.action === "create-option") {
             Meteor.call("kategori.insert", newValue.label);
         }
         newValue.label = s(newValue.label)

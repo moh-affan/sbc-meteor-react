@@ -14,10 +14,6 @@ import Diskon from "../ui/pages/Diskon";
 import Produk from "../ui/pages/Produk";
 
 const browserHistory = createBrowserHistory();
-const isLogin = () => {
-  console.log(Meteor.userId());
-  return false;
-};
 export const renderRoutes = () => {
   const isLogin = () => {
     return Meteor.userId() != null;

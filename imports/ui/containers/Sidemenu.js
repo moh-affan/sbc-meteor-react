@@ -52,8 +52,6 @@ export default class Sidemenu extends Component {
                                     Produk</a></li>
                                 <li className="treatment"><a href="/treatment"><i className="fa fa-angle-double-right"></i>
                                     Treatment</a></li>
-                                <li className="penyusutan"><a href="/penyusutan"><i className="fa fa-angle-double-right"></i>
-                                    Penyusutan</a></li>
                                 <li className="jatah"><a href="/jatah"><i className="fa fa-angle-double-right"></i> Jatah</a>
                                 </li>
                             </ul>

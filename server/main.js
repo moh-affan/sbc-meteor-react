@@ -6,7 +6,10 @@ import "../imports/api/kategori";
 import "../imports/api/diskon";
 import "../imports/api/jabatan";
 import "../imports/api/produk";
+import "../imports/api/treatment";
+import "../imports/api/jatah";
+import "../imports/api/transaksi/pembelian-produk";
 
 Meteor.startup(() => {
-  // code to run on server at startup
+    // code to run on server at startup
 });

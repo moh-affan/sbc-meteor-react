@@ -2,23 +2,25 @@ import {Meteor} from "meteor/meteor";
 import {Mongo} from "meteor/mongo";
 import {check} from "meteor/check";
 
-export const MProduk = new Mongo.Collection("produk");
+export const MTreatment = new Mongo.Collection("treatment");
 
 if (Meteor.isServer) {
-    // This code only runs on the server
-    Meteor.publish("produk", function produkPublication() {
-        return MProduk.find({});
+    Meteor.publish("treatment", function produkPublication() {
+        return MTreatment.find({});
     });
 }
 
 Meteor.methods({
-    "produk.insert"(id, nama, kategori, supplier, hargaJual, hargaBeli, diskon) {
+    "treatment.insert"(id, nama, kategori, supplier, hargaJual, hargaBeli, diskon, penyusutan) {
         check(id, String);
         check(nama, String);
+        check(penyusutan, Number);
         if (!this.userId) {
             throw new Meteor.Error("not-authorized");
         }
-        MProduk.insert({
+        if (penyusutan === null || penyusutan === "")
+            penyusutan = 0;
+        MTreatment.insert({
             id,
             nama,
             kategori,
@@ -26,13 +28,13 @@ Meteor.methods({
             hargaJual,
             hargaBeli,
             diskon: diskon,
+            penyusutan: penyusutan,
             createdAt: new Date(),
             owner: this.userId,
             updater: this.userId
-            // username: Meteor.users.findOne(this.userId).username
         });
     },
-    "produk.update"(
+    "treatment.update"(
         _id,
         id,
         nama,
@@ -40,15 +42,19 @@ Meteor.methods({
         supplier,
         hargaJual,
         hargaBeli,
-        diskon
+        diskon,
+        penyusutan
     ) {
         check(_id, String);
         check(id, String);
         check(nama, String);
+        check(penyusutan, Number);
         if (!this.userId) {
             throw new Meteor.Error("not-authorized");
         }
-        MProduk.update(_id, {
+        if (penyusutan === null || penyusutan === "")
+            penyusutan = 0;
+        MTreatment.update(_id, {
             $set: {
                 id: id,
                 nama: nama,
@@ -57,17 +63,17 @@ Meteor.methods({
                 hargaJual: hargaJual,
                 hargaBeli: hargaBeli,
                 diskon: diskon,
+                penyusutan: penyusutan,
                 updater: this.userId,
                 updatedAt: new Date()
             }
         });
     },
-    "produk.remove"(produkId) {
+    "treatment.remove"(produkId) {
         check(produkId, String);
         if (!this.userId) {
-            // If the task is private, make sure only the owner can delete it
             throw new Meteor.Error("not-authorized");
         }
-        MProduk.remove(produkId);
+        MTreatment.remove(produkId);
     }
 });

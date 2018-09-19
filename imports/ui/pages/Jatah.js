@@ -6,18 +6,16 @@ import Sidemenu from "../containers/Sidemenu";
 import swal from "sweetalert";
 import ReactTable from "react-table";
 import "react-table/react-table.css";
-import moment from "moment";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-import {MDiskon} from "../../api/diskon";
+import {MJatah} from "../../api/jatah";
 
 class CellDelete extends Component {
     constructor(props) {
         super(props);
     }
 
-    removeDiskon() {
+    removeJatah() {
         swal({
             title: "Are you sure?",
             text: "Apa Anda yakin ingin menghapus ?",
@@ -25,7 +23,7 @@ class CellDelete extends Component {
             dangerMode: true
         }).then(willDelete => {
             if (willDelete) {
-                Meteor.call("diskon.remove", this.props.diskon._id);
+                Meteor.call("jatah.remove", this.props.jatah._id);
                 swal("Dihapus!", "Data berhasil dihapus!", "success");
             }
         });
@@ -35,7 +33,7 @@ class CellDelete extends Component {
         return (
             <span
                 className="fa fa-trash-o center-block text-center"
-                onClick={this.removeDiskon.bind(this)}
+                onClick={this.removeJatah.bind(this)}
             />
         );
     }
@@ -46,20 +44,17 @@ class CellEdit extends Component {
         super(props);
     }
 
-    showDiskon() {
-        $("input[name=_id]").val(this.props.diskon._id);
-        $("input[name=id]").val(this.props.diskon.id);
-        $("input[name=nama]").val(this.props.diskon.nama);
-        $("input[name=tglAwal]").val(this.props.diskon.tglAwal);
-        $("input[name=tglAkhir]").val(this.props.diskon.tglAkhir);
-        $("input[name=jmlDiskon]").val(this.props.diskon.jmlDiskon);
+    showJatah() {
+        $("input[name=_id]").val(this.props.jatah._id);
+        $("input[name=nominal]").val(this.props.jatah.nominal);
+        $("input[name=keterangan]").val(this.props.jatah.keterangan);
     }
 
     render() {
         return (
             <span
                 className="fa fa-pencil center-block text-center"
-                onClick={this.showDiskon.bind(this)}
+                onClick={this.showJatah.bind(this)}
             />
         );
     }
@@ -68,87 +63,59 @@ class CellEdit extends Component {
 class DisplayData extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            tglAwal: moment(),
-            tglAkhir: moment()
-        };
-        this.handleTglAwalChange = this.handleTglAwalChange.bind(this);
-        this.handleTglAkhirChange = this.handleTglAkhirChange.bind(this);
-    }
-
-    renderDiskon() {
-        return this.props.diskon.map(p => {
-            return <RowData key={p.id} diskon={p}/>;
-        });
     }
 
     resetForm(target) {
         target._id.value = "";
-        target.id.value = "";
-        target.nama.value = "";
-        target.tglAwal.value = "";
-        target.tglAkhir.value = "";
-        target.jmlDiskon.value = "";
-    }
-
-    handleTglAwalChange(arg) {
-        this.setState({
-            tglAwal: arg
-        });
-    }
-
-    handleTglAkhirChange(arg) {
-        this.setState({
-            tglAkhir: arg
-        });
+        target.nominal.value = "";
+        target.keterangan.value = "";
     }
 
     handleSubmit(event) {
         event.preventDefault();
         let target = event.target;
-        if (target._id.value != "") {
+        if (target._id.value !== "") {
             Meteor.call(
-                "diskon.update",
+                "jatah.update",
                 target._id.value,
-                target.id.value,
-                target.nama.value,
-                target.tglAwal.value,
-                target.tglAkhir.value,
-                Number.parseInt(target.jmlDiskon.value)
+                Number.parseInt(target.nominal.value),
+                target.keterangan.value
             );
         } else {
             Meteor.call(
-                "diskon.insert",
-                target.id.value,
-                target.nama.value,
-                target.tglAwal.value,
-                target.tglAkhir.value,
-                Number.parseInt(target.jmlDiskon.value)
+                "jatah.insert",
+                Number.parseInt(target.nominal.value),
+                target.keterangan.value
             );
         }
-        // target.reset();
         this.resetForm(target);
     }
 
     render() {
         const columns = [
-            {Header: "ID", accessor: "id"},
-            {Header: "Nama", accessor: "nama"},
-            {Header: "Tanggal Awal", accessor: "tglAwal"},
-            {Header: "Tanggal Akhir", accessor: "tglAkhir"},
-            {Header: "Jumlah Diskon", accessor: "jmlDiskon"},
+            {
+                Header: "No.",
+                filterable: false,
+                id: "row",
+                Cell: (row) => {
+                    return <span className="text-center">{row.index + 1}</span>
+                },
+                minWidth: 50
+            },
+            {Header: "Nominal", accessor: "nominal"},
+            {Header: "Keterangan", accessor: "keterangan"},
             {
                 Header: "Hapus",
                 filterable: false,
                 sortable: false,
-                Cell: props => <CellDelete diskon={props.original}/>,
+                Cell: props => <CellDelete jatah={props.original}/>,
                 minWidth: 50
             },
             {
                 Header: "Edit",
                 filterable: false,
                 sortable: false,
-                Cell: props => <CellEdit diskon={props.original}/>,
+                Cell: props => <CellEdit jatah={props.original}/>,
                 minWidth: 50
             }
         ];
@@ -156,7 +123,7 @@ class DisplayData extends Component {
             <aside className="right-side">
                 <section className="content-header">
                     <h1>
-                        Diskon
+                        Jatah
                         <small>Data Master</small>
                     </h1>
                     <ol className="breadcrumb">
@@ -166,7 +133,7 @@ class DisplayData extends Component {
                             </a>
                         </li>
                         <li>Data Master</li>
-                        <li className="active">Diskon</li>
+                        <li className="active">Jatah</li>
                     </ol>
                 </section>
 
@@ -176,12 +143,12 @@ class DisplayData extends Component {
                             <div className="alert-place"/>
                             <div className="box box-primary">
                                 <div className="box-header">
-                                    <h3 className="box-title">Data Diskon</h3>
+                                    <h3 className="box-title">Data Jatah</h3>
                                     <div className="pull-right box-tools"/>
                                 </div>
                                 <div className="box-body table-responsive">
                                     <ReactTable
-                                        data={this.props.diskon}
+                                        data={this.props.jatah}
                                         columns={columns}
                                         previousText="Sebelumnya"
                                         nextText="Selanjutnya"
@@ -206,76 +173,35 @@ class DisplayData extends Component {
                             <div className="alert-place"/>
                             <div className="box box-success">
                                 <div className="box-header">
-                                    <h3 className="box-title">Input Data Diskon</h3>
+                                    <h3 className="box-title">Input Data Jatah</h3>
                                     <div className="pull-right box-tools"/>
                                 </div>
                                 <div className="box-body">
                                     <form
-                                        className="form form-diskon"
+                                        className="form form-jatah"
                                         role="form"
                                         onSubmit={this.handleSubmit.bind(this)}
                                     >
                                         <div className="form-group">
-                                            <label>ID</label>
+                                            <label>Nominal</label>
                                             <input
-                                                type="text"
-                                                name="id"
-                                                ref="id"
+                                                type="number"
+                                                name="nominal"
+                                                ref="nominal"
                                                 className="form-control"
-                                                placeholder="Masukkan ID"
+                                                placeholder="Masukkan Nominal"
                                                 required
                                             />
                                             <input type="hidden" name="_id" ref="_id" value=""/>
                                         </div>
                                         <div className="form-group">
-                                            <label>Nama</label>
+                                            <label>Keterangan</label>
                                             <input
                                                 type="text"
-                                                name="nama"
-                                                ref="nama"
+                                                name="keterangan"
+                                                ref="keterangan"
                                                 className="form-control"
-                                                placeholder="Masukkan Nama"
-                                                required
-                                            />
-                                        </div>
-                                        <div className="form-group">
-                                            <label>Tanggal Awal</label>
-                                            <DatePicker
-                                                name="tglAwal"
-                                                className="form-control"
-                                                locale="ID-id"
-                                                showYearDropdown
-                                                showMonthDropdown
-                                                isClearable={false}
-                                                dropdownMode="select"
-                                                onChange={this.handleTglAwalChange}
-                                                dateFormat="DD-MM-YYYY"
-                                                selected={this.state.tglAwal}
-                                            />
-                                        </div>
-                                        <div className="form-group">
-                                            <label>Tanggal Akhir</label>
-                                            <DatePicker
-                                                name="tglAkhir"
-                                                className="form-control"
-                                                locale="ID-id"
-                                                showYearDropdown
-                                                showMonthDropdown
-                                                isClearable={false}
-                                                dropdownMode="select"
-                                                onChange={this.handleTglAkhirChange}
-                                                dateFormat="DD-MM-YYYY"
-                                                selected={this.state.tglAkhir}
-                                            />
-                                        </div>
-                                        <div className="form-group">
-                                            <label>Jumlah Diskon</label>
-                                            <input
-                                                type="number"
-                                                name="jmlDiskon"
-                                                ref="jmlDiskon"
-                                                className="form-control"
-                                                placeholder="Masukkan Jumlah Diskon"
+                                                placeholder="Masukkan Keterangan"
                                                 required
                                             />
                                         </div>
@@ -296,7 +222,7 @@ class DisplayData extends Component {
     }
 }
 
-class Diskon extends Component {
+class Jatah extends Component {
     constructor(props) {
         super(props);
     }
@@ -312,7 +238,7 @@ class Diskon extends Component {
                 <Header nama={pengguna}/>
                 <div className="wrapper row-offcanvas row-offcanvas-left">
                     <Sidemenu activeMenu="data-master" nama={pengguna}/>
-                    <DisplayData diskon={this.props.diskon}/>
+                    <DisplayData jatah={this.props.jatah}/>
                 </div>
             </div>
         );
@@ -320,10 +246,10 @@ class Diskon extends Component {
 }
 
 export default withTracker(() => {
-    Meteor.subscribe("diskon");
+    Meteor.subscribe("jatah");
 
     return {
-        diskon: MDiskon.find({}, {sort: {createdAt: -1}}).fetch(),
+        jatah: MJatah.find({}, {sort: {createdAt: -1}}).fetch(),
         currentUser: Meteor.user()
     };
-})(Diskon);
+})(Jatah);

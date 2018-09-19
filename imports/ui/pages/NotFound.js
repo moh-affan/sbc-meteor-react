@@ -3,22 +3,23 @@ import React, {Component} from 'react';
 class NotFound extends Component {
     render() {
         return (
-            <aside class="right-side" style={{ width: 100 + "%", marginLeft: 0 + 'px', height: 100 + 'vh' }}>
-                <section class="content">
+            <aside className="right-side" style={{width: 100 + "%", marginLeft: 0 + 'px', height: 100 + 'vh'}}>
+                <section className="content">
 
-                    <div class="error-page">
-                        <h2 class="headline text-info"> 404</h2>
-                        <div class="error-content">
-                            <h3><i class="fa fa-warning text-yellow"></i> Oops! Page not found.</h3>
+                    <div className="error-page">
+                        <h2 className="headline text-info"> 404</h2>
+                        <div className="error-content">
+                            <h3><i className="fa fa-warning text-yellow"/> Oops! Page not found.</h3>
                             <p>
                                 We could not find the page you were looking for.
                                 Meanwhile, you may <a href='/'>return to dashboard</a> or try using the search form.
                             </p>
-                            <form class='search-form'>
-                                <div class='input-group'>
-                                    <input type="text" name="search" class='form-control' placeholder="Search" />
-                                    <div class="input-group-btn">
-                                        <button type="submit" name="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
+                            <form className='search-form'>
+                                <div className='input-group'>
+                                    <input type="text" name="search" className='form-control' placeholder="Search"/>
+                                    <div className="input-group-btn">
+                                        <button type="submit" name="submit" className="btn btn-primary"><i
+                                            className="fa fa-search"/></button>
                                     </div>
                                 </div>
                             </form>

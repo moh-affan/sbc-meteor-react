@@ -296,7 +296,7 @@ class Pelanggan extends Component {
     render() {
         var pengguna = "Pengguna";
         if (this.props.currentUser) {
-            pengguna = this.props.currentUser.emails[0].address;
+            pengguna = this.props.currentUser.profile.nama;
         }
 
         return (

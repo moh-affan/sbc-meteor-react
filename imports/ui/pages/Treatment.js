@@ -9,7 +9,7 @@ import "react-table/react-table.css";
 import CreatableSelect from "react-select/lib/Creatable";
 import Select from "react-select";
 
-import {MProduk} from "../../api/produk";
+import {MTreatment} from "../../api/treatment";
 import {MKategori} from "../../api/kategori";
 import {MSupplier} from "../../api/supplier";
 import {MDiskon} from "../../api/diskon";
@@ -19,7 +19,7 @@ class CellDelete extends Component {
         super(props);
     }
 
-    removeProduk() {
+    removeTreatment() {
         swal({
             title: "Are you sure?",
             text: "Apa Anda yakin ingin menghapus ?",
@@ -27,7 +27,7 @@ class CellDelete extends Component {
             dangerMode: true
         }).then(willDelete => {
             if (willDelete) {
-                Meteor.call("produk.remove", this.props.produk._id);
+                Meteor.call("treatment.remove", this.props.treatment._id);
                 swal("Dihapus!", "Data berhasil dihapus!", "success");
             }
         });
@@ -35,12 +35,10 @@ class CellDelete extends Component {
 
     render() {
         return (
-            <div className="label label-danger">
-                <span
-                    className="fa fa-trash-o center-block text-center"
-                    onClick={this.removeProduk.bind(this)}
-                />
-            </div>
+            <span
+                className="fa fa-trash-o center-block text-center"
+                onClick={this.removeTreatment.bind(this)}
+            />
         );
     }
 }
@@ -50,20 +48,18 @@ class CellEdit extends Component {
         super(props);
     }
 
-    showProduk() {
+    showTreatment() {
         if (typeof this.props.onEditCallback === "function") {
-            this.props.onEditCallback(this.props.produk);
+            this.props.onEditCallback(this.props.treatment);
         }
     }
 
     render() {
         return (
-            <div className="label label-primary">
-                <span
-                    className="fa fa-pencil center-block text-center"
-                    onClick={this.showProduk.bind(this)}
-                />
-            </div>
+            <span
+                className="fa fa-pencil center-block text-center"
+                onClick={this.showTreatment.bind(this)}
+            />
         );
     }
 }
@@ -71,7 +67,7 @@ class CellEdit extends Component {
 class DisplayData extends Component {
     constructor(props) {
         super(props);
-        this.state = {kategori: null, supplier: null, diskon: null, idProduk: ""};
+        this.state = {kategori: null, supplier: null, diskon: null, idTreatment: ""};
     }
 
     resetForm(event) {
@@ -79,13 +75,14 @@ class DisplayData extends Component {
             kategori: null,
             supplier: null,
             diskon: null,
-            idProduk: ""
+            idTreatment: ""
         });
         try {
             event.target.pid.value = "";
             event.target.nama.value = "";
             event.target.hargaJual.value = "";
             event.target.hargaBeli.value = "";
+            event.target.penyusutan.value = "";
         } catch (ex) {
             //
         }
@@ -106,28 +103,30 @@ class DisplayData extends Component {
                 timer: 1000
             });
         let target = event.target;
-        if (this.state.idProduk !== "") {
+        if (this.state.idTreatment !== "") {
             Meteor.call(
-                "produk.update",
-                this.state.idProduk,
+                "treatment.update",
+                this.state.idTreatment,
                 target.pid.value,
                 target.nama.value,
                 this.state.kategori.label,
                 this.state.supplier ? this.state.supplier.obj : null,
                 target.hargaJual.value,
                 target.hargaBeli.value,
-                this.state.diskon ? this.state.diskon.obj : null
+                this.state.diskon ? this.state.diskon.obj : null,
+                Number.parseInt(target.penyusutan.value)
             );
         } else {
             Meteor.call(
-                "produk.insert",
+                "treatment.insert",
                 target.pid.value,
                 target.nama.value,
                 this.state.kategori.label,
                 this.state.supplier ? this.state.supplier.obj : null,
                 target.hargaJual.value,
                 target.hargaBeli.value,
-                this.state.diskon ? this.state.diskon.obj : null
+                this.state.diskon ? this.state.diskon.obj : null,
+                Number.parseInt(target.penyusutan.value)
             );
         }
         // target.reset();
@@ -161,25 +160,26 @@ class DisplayData extends Component {
         });
     };
 
-    showDataProduk(produk) {
-        this.setState({idProduk: produk._id});
-        $("input[name=pid]").val(produk.id);
-        $("input[name=nama]").val(produk.nama);
+    showDataTreatment(treatment) {
+        this.setState({idTreatment: treatment._id});
+        $("input[name=pid]").val(treatment.id);
+        $("input[name=nama]").val(treatment.nama);
         this.setState({
-            kategori: {value: produk.kategori, label: produk.kategori},
-            supplier: produk.supplier !== null ? {
-                value: produk.supplier.nama,
-                label: produk.supplier.nama,
-                obj: produk.supplier
-            } : null,
-            diskon: produk.diskon !== null ? {
-                value: produk.diskon.nama,
-                label: produk.diskon.nama,
-                obj: produk.diskon
+            kategori: {value: treatment.kategori, label: treatment.kategori},
+            supplier: {
+                value: treatment.supplier.nama,
+                label: treatment.supplier.nama,
+                obj: treatment.supplier
+            },
+            diskon: treatment.diskon !== null ? {
+                value: treatment.diskon.nama,
+                label: treatment.diskon.nama,
+                obj: treatment.diskon
             } : null
         });
-        $("input[name=hargaJual]").val(produk.hargaJual);
-        $("input[name=hargaBeli]").val(produk.hargaBeli);
+        $("input[name=hargaJual]").val(treatment.hargaJual);
+        $("input[name=hargaBeli]").val(treatment.hargaBeli);
+        $("input[name=penyusutan]").val(treatment.penyusutan);
     }
 
     render() {
@@ -190,7 +190,7 @@ class DisplayData extends Component {
                 />,
                 filterable: false,
                 sortable: false,
-                Cell: props => <CellDelete produk={props.original}/>,
+                Cell: props => <CellDelete treatment={props.original}/>,
                 minWidth: 30
             },
             {
@@ -201,8 +201,8 @@ class DisplayData extends Component {
                 sortable: false,
                 Cell: props => (
                     <CellEdit
-                        produk={props.original}
-                        onEditCallback={this.showDataProduk.bind(this)}
+                        treatment={props.original}
+                        onEditCallback={this.showDataTreatment.bind(this)}
                     />
                 ),
                 minWidth: 30
@@ -213,6 +213,7 @@ class DisplayData extends Component {
             {Header: "Supplier", accessor: "supplier.nama"},
             {Header: "Harga Jual", accessor: "hargaJual"},
             {Header: "Harga Beli", accessor: "hargaBeli"},
+            {Header: "Penyusutan", accessor: "penyusutan"},
             {Header: "Diskon", accessor: "diskon.nama"}
         ];
 
@@ -220,7 +221,7 @@ class DisplayData extends Component {
             <aside className="right-side">
                 <section className="content-header">
                     <h1>
-                        Produk
+                        Treatment
                         <small>Data Master</small>
                     </h1>
                     <ol className="breadcrumb">
@@ -230,7 +231,7 @@ class DisplayData extends Component {
                             </a>
                         </li>
                         <li>Data Master</li>
-                        <li className="active">Produk</li>
+                        <li className="active">Treatment</li>
                     </ol>
                 </section>
 
@@ -240,12 +241,12 @@ class DisplayData extends Component {
                             <div className="alert-place"/>
                             <div className="box box-primary">
                                 <div className="box-header">
-                                    <h3 className="box-title">Data Produk</h3>
+                                    <h3 className="box-title">Data Treatment</h3>
                                     <div className="pull-right box-tools"/>
                                 </div>
                                 <div className="box-body table-responsive">
                                     <ReactTable
-                                        data={this.props.produk}
+                                        data={this.props.treatment}
                                         columns={columns}
                                         previousText="Sebelumnya"
                                         nextText="Selanjutnya"
@@ -270,12 +271,12 @@ class DisplayData extends Component {
                             <div className="alert-place"/>
                             <div className="box box-success">
                                 <div className="box-header">
-                                    <h3 className="box-title">Input Data Produk</h3>
+                                    <h3 className="box-title">Input Data Treatment</h3>
                                     <div className="pull-right box-tools"/>
                                 </div>
                                 <div className="box-body">
                                     <form
-                                        className="form form-produk"
+                                        className="form form-treatment"
                                         role="form"
                                         onSubmit={this.handleSubmit.bind(this)}
                                     >
@@ -347,6 +348,17 @@ class DisplayData extends Component {
                                             />
                                         </div>
                                         <div className="form-group">
+                                            <label>Penyusutan</label>
+                                            <input
+                                                type="number"
+                                                name="penyusutan"
+                                                ref="penyusutan"
+                                                className="form-control"
+                                                placeholder="Masukkan Penyusutan"
+                                                required
+                                            />
+                                        </div>
+                                        <div className="form-group">
                                             <label>Diskon</label>
                                             <Select
                                                 required
@@ -378,7 +390,7 @@ class DisplayData extends Component {
     }
 }
 
-class Produk extends Component {
+class Treatment extends Component {
     constructor(props) {
         super(props);
     }
@@ -395,7 +407,7 @@ class Produk extends Component {
                 <div className="wrapper row-offcanvas row-offcanvas-left">
                     <Sidemenu activeMenu="data-master" nama={pengguna}/>
                     <DisplayData
-                        produk={this.props.produk}
+                        treatment={this.props.treatment}
                         kategori={this.props.kategori}
                         supplier={this.props.supplier}
                         diskon={this.props.diskon}
@@ -407,7 +419,7 @@ class Produk extends Component {
 }
 
 export default withTracker(() => {
-    Meteor.subscribe("produk");
+    Meteor.subscribe("treatment");
     Meteor.subscribe("kategori");
     Meteor.subscribe("supplier");
     Meteor.subscribe("diskon");
@@ -430,10 +442,10 @@ export default withTracker(() => {
         obj: j
     }));
     return {
-        produk: MProduk.find({}, {sort: {createdAt: -1}}).fetch(),
+        treatment: MTreatment.find({}, {sort: {createdAt: -1}}).fetch(),
         kategori: selectForKats,
         supplier: selectForSups,
         diskon: selectForDiskons,
         currentUser: Meteor.user()
     };
-})(Produk);
+})(Treatment);

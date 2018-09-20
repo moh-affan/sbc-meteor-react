@@ -11,12 +11,12 @@ if (Meteor.isServer) {
 }
 
 Meteor.methods({
-    "pembelianProduk.insert"(tgl, noNota, supplier, keterangan, total, detailProduk) {
+    "pembelianProduk.insert"(id, tgl, noNota, supplier, keterangan, total, detailProduk) {
         if (!this.userId) {
             throw new Meteor.Error("not-authorized");
         }
         MPembelianProduk.insert({
-            tgl, noNota, supplier, keterangan, total, detailProduk,
+            id, tgl, noNota, supplier, keterangan, total, detailProduk,
             createdAt: new Date(),
             owner: this.userId,
             updater: this.userId
